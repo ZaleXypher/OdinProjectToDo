@@ -6,6 +6,7 @@ export class Project{
 
     addToDo(title, description, due = new Date, priority){
         let temp = {};
+        temp.project = this.projectTitle;
         temp.taskTitle = title;
         temp.taskDescription = description;
         temp.due = due;
