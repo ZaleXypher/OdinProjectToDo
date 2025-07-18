@@ -1,0 +1,103 @@
+body{
+    --color-sidebar: #63768D;
+    --color-sidebar-button: #554971;
+    --color-sidebar-button-onclick: #37304b;
+    --color-sidebar-darktext: black;
+    --color-sidebar-text: white;
+    --color-topbar: #ABB6C4;
+    --color-sort-color: #CFD5DD;
+    --color-sort-hover: #44505F;
+    
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: grid;
+    grid-template-columns: minmax(200px, 250px);
+}
+
+nav{
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+    flex-grow: 1;
+    background-color: var(--color-sidebar);
+    height: 100vh;
+    box-sizing: border-box;
+    padding: 1.5em;
+}
+
+nav>button{
+    font-size: 1em;
+    color: var(--color-sidebar-darktext);
+    padding: .6em;
+    text-align: left;
+    cursor: pointer;
+    appearance: none;
+    background-color: transparent;
+    border-style: none;
+    border-radius: .5em;
+    display: flex;
+    align-items: center;
+    gap: .3em;
+}
+
+nav>button>img{
+    height: 1.5em;
+}
+
+nav>button:hover, .completion>button:hover{
+    background-color: var(--color-sidebar-button);
+    color: var(--color-sidebar-text);
+    margin-left: 1em;
+}
+
+nav>button:active, .completion>button:active{
+    background-color: var(--color-sidebar-button-onclick);
+    color: var(--color-sidebar-text);
+}
+
+.project-list{
+    display: flex;
+    flex-direction: column;
+}
+
+.title{
+    font: 1.1em;
+    font-weight: 600;
+    text-align: center;
+    align-self: center;
+}
+
+#content{
+    grid-column: 2 / 3;
+}
+
+#top-bar{
+    display: grid;
+    grid-template-columns: 5fr 1fr 1fr;
+    background-color: var(--color-topbar);
+    box-sizing: border-box;
+    padding: .5em;
+    gap: 1em;
+}
+
+.show-complete{
+    grid-column: 2 / 3;
+    justify-self: center;
+}
+
+.sort{
+    grid-column: 3 / 4;
+    justify-self: center;
+}
+
+#top-bar select{
+    appearance: none;
+    border-style: none;
+    border-radius: .5em;
+    padding: .5em;
+    background-color: var(--color-sort-color);
+}
+
+#top-bar select:hover{
+    background-color: var(--color-sort-hover);
+}

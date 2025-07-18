@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do</title>
+</head>
+<body>
+    <nav>
+        <img src="./images/logo.svg" alt="Logo">
+        <button type="button" id="show-all"><img src="./images/list-box-outline.svg">View All</button>
+        <button type="button" class="today"><img src="./images/clipboard-alert-outline.svg">Due Today</button>
+        <button type="button" class="upcoming"><img src="./images/clipboard-text-clock-outline.svg">Upcoming</button>
+        <button type="button" class="past"><img src="./images/clipboard-remove-outline.svg">Past Due</button>
+        <button type="button" class="uncomplete"><img src="./images/clipboard-text-off.svg">To Do</button>
+        <button type="button" class="complete"><img src="./images/clipboard-check-outline.svg">Complete</button>
+        <div class="project-list">
+            <span class="title">Projects</span>
+        </div>
+    </nav>
+    <div id="content">
+        <div id="top-bar">
+            <div class="current-title"></div>
+            <div class="show-complete">
+                <select name="show-completion" id="show-complete">
+                    <option value="both">Show All</option>
+                    <option value="completed">Completed Only</option>
+                    <option value="incomplete">Incomplete Only</option>
+                </select>
+            </div>
+            <div class="sort">
+                <select name="sortby" id="sort">
+                    <option value="default">Default</option>
+                    <option value="high-priority">High-to-Low Priority</option>
+                    <option value="low-priority">Low-to-High Priority</option>
+                    <option value="closest-due">Closest Due</option>
+                    <option value="furthest-due">Furthest Due</option>
+                </select>
+            </div>
+        </div>
+        <div class="todo-list"></div>
+    </div>
+</body>
+</html>
