@@ -5,6 +5,7 @@ body{
     --color-sidebar-darktext: black;
     --color-sidebar-text: white;
     --color-topbar: #ABB6C4;
+    --color-card: #DBE0E6;
     --color-sort-color: #CFD5DD;
     --color-sort-hover: #44505F;
     
@@ -91,13 +92,18 @@ nav>button:active, .completion>button:active{
 }
 
 #top-bar select{
+    font-weight: 550;
     appearance: none;
     border-style: none;
     border-radius: .5em;
-    padding: .5em;
+    padding: 1em;
     background-color: var(--color-sort-color);
 }
 
 #top-bar select:hover{
     background-color: var(--color-sort-hover);
+}
+
+.todo-list{
+    background-color: var(--color-card);
 }
