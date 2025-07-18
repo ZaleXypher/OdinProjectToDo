@@ -6,17 +6,62 @@
     <title>To Do</title>
 </head>
 <body>
+    <dialog id="task">
+        <form action=""method="dialog" id="task-form">
+            <div class="input">
+                <label for="task-title">Task</label>
+                <input type="text" name="task-title" id="task-title">
+            </div>
+            <div class="input">
+                <label for="task-description">Description</label>
+                <input type="text" name="task-description" id="task-description">
+            </div>
+            <div class="input">
+                <label for="task-due">Due By</label>
+                <input type="date" name="task-due" id="task-due">
+            </div>
+            <div class="input">
+                <label for="task-priority">Priority</label>
+                <select name="task-priority" id="task-priority">
+                    <option value="0">Low</option>
+                    <option value="1">Medium</option>
+                    <option value="2">High</option>
+                </select>
+            </div>
+            <div class="input">
+                <label for="task-project">For project</label>
+                <select name="task-project" id="task-project"></select>
+            </div>
+            <div class="action-buttons">
+                <button type="button" class="close-dialog">Close</button>
+                <button type="submit" class="submit-form">Add To List</button>
+            </div>
+        </form>
+    </dialog>
+    <dialog id="project">
+        <form action="" method="dialog" id="project-form">
+            <div class="input">
+                <label for="project-title">Project</label>
+                <input type="text" name="project-title" id="project-title">
+            </div>
+            <div class="action-buttons">
+                <button type="button" class="close-dialog">Close</button>
+                <button type="submit" class="submit-form">Add Project</button>
+            </div>
+        </form>
+    </dialog>
     <nav>
         <img src="./images/logo.svg" alt="Logo">
+        <button type="button" id="add-task"><img src="./images/book-plus.svg">Add Task</button>
         <button type="button" id="show-all"><img src="./images/list-box-outline.svg">View All</button>
         <button type="button" class="today"><img src="./images/clipboard-alert-outline.svg">Due Today</button>
         <button type="button" class="upcoming"><img src="./images/clipboard-text-clock-outline.svg">Upcoming</button>
         <button type="button" class="past"><img src="./images/clipboard-remove-outline.svg">Past Due</button>
         <button type="button" class="uncomplete"><img src="./images/clipboard-text-off.svg">To Do</button>
         <button type="button" class="complete"><img src="./images/clipboard-check-outline.svg">Complete</button>
-        <div class="project-list">
-            <span class="divider">Projects</span>
-        </div>
+        <span class="divider">Projects</span>
+        <button type="button" id="add-project"><img src="./images/book-plus.svg">Add Project</button>
+        <div class="project-list"></div>
     </nav>
     <div id="content">
         <div id="top-bar">

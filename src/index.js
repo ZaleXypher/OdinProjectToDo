@@ -1,81 +1,49 @@
 import "./style.css";
-import {Project} from "./todo.js";
-import projectSymbol from "./images/book-plus.svg";
+import {Project, visualList} from "./todo.js";
+import projectSymbol from "./images/book-variant.svg";
+import completed from "./images/book-plus.svg";
+import incomplete from "./images/book-minus.svg";
 
 /*TODO: replace with localStorage */
 let projectList = []
 function addToList(project){
     projectList.push(project);
     showProjects();
+    updateFormList();
 
     function showProjects(){
+        const list = document.querySelector(".project-list");
+        list.replaceChildren();
         for(let i = 0; i < projectList.length; i++){
-            const list = document.querySelector(".project-list")
             let project = document.createElement("div");
             project.classList.add("project");
+
             let image = document.createElement("img");
             image.src = projectSymbol;
             project.appendChild(image);
+
             let text = document.createElement("button");
             text.textContent = projectList[i].projectTitle;
             project.appendChild(text);
+            
+            list.appendChild(project);
+        }
+    }
+
+    function updateFormList(){
+        const list = document.querySelector("#task-project");
+        list.replaceChildren();
+        for(let i = 0; i < projectList.length; i++){
+            let project = document.createElement("option");
+            project.value = projectList[i].projectTitle;
+            project.textContent = projectList[i].projectTitle;
             list.appendChild(project);
         }
     }
 }
 
-class createList {
-    constructor (list){
-        this.logicTodo = list;
-        this.visualList = [];
-    }
-
-    get list(){
-        return this.visualList;
-    }
-    
-    resetList(){
-        this.visualList = [];
-        for(let i = 0; i < this.logicTodo.length; i++){
-            for(let o = 0; o < this.logicTodo[i].todo.length; o++){
-                this.visualList.push(this.logicTodo[i].todo[o]);
-            }
-        }
-    }
-
-    sortPriority(){
-        function high(){
-            this.visualList.sort((a, b) => b.priority - a.priority)
-        }
-        function low(){
-            this.visualList.sort((a, b) => a.priority - b.priority)
-        }
-        return {high, low}
-    }
-    
-    sortDue(){
-        function closest(){
-
-        }
-        function furthest(){
-
-        }
-    }
-
-    sortProject(project){
-        this.visualList = [];
-        for(let i = 0; i < this.logicTodo; i++){
-            if(project == this.logicTodo[i]){
-                this.visualList.push(this.logicTodo[i]);
-            }
-        }
-    }
-}
-
-function showList(list){
-    function showCard(listItem){
-        const container = document.querySelector("#todo-list");
-
+function showList(){
+    function createCard(listItem){
         let card = document.createElement("div");
         card.classList.add("card");
 
@@ -84,11 +52,17 @@ function showList(list){
         title.textContent = listItem.taskTitle;
         card.appendChild(title);
 
+        let completion = document.createElement("div");
+        completion.classList.add("completion-button")
         let complete = document.createElement("button");
         complete.setAttribute("type", "button");
         complete.classList.add("complete-button");
-        complete.textContent = "Incomplete";
-        card.appendChild(complete);
+        let completeIcon = document.createElement("img");
+        checkCompletion();
+        completion.appendChild(completeIcon);
+        completion.appendChild(complete);
+        completion.addEventListener("click", () => {listItem.completion = !listItem.completion; checkCompletion()})
+        card.appendChild(completion);
 
         let description = document.createElement("div");
         description.classList.add("description");
@@ -105,40 +79,109 @@ function showList(list){
         date.textContent = listItem.due;
         card.appendChild(date);
 
-        let priority = document.createElement("div");
-        priority.classList.add("priority")
         switch (listItem.priority){
             case "2":
-                priority.textContent = "High";
-                priority.classList.add("high");
+                card.classList.add("high");
                 break;
             case "1":
-                priority.textContent = "Medium";
-                priority.classList.add("med");
+                card.classList.add("med");
                 break;
             case "0":
-                priority.textContent = "Low";
-                priority.classList.add("low");
+                card.classList.add("low");
                 break;
         }
-        card.appendChild(priority);
         
-        container.appendChild(card);
+        function checkCompletion(){
+            if(listItem.completion == 1){
+                completeIcon.src = completed
+                complete.textContent = "Complete";
+            }
+            else{
+                completeIcon.src = incomplete
+                complete.textContent = "Incomplete";
+            }
+        };
+        return card
     }
-    for(let i = 0; i < list.length; i++){
-        showCard(list[i])
+    function showCard(card){
+        const cardsShown = document.querySelector("#todo-list")
+        cardsShown.appendChild(card)
+    }
+    return {createCard, showCard}
+}
+
+function processForm(){
+    function processProject(){
+        const projDialog = document.querySelector("#project-form");
+        let projTitle = projDialog.querySelector("#project-title").value;
+        let projCreate = new Project(projTitle);
+        addToList(projCreate);
+        projDialog.reset();
+    }
+
+    function processTask(){
+        const taskDialog = document.querySelector("#task-form");
+        let taskName = taskDialog.querySelector("#task-title").value;
+        let taskDescription = taskDialog.querySelector("#task-description").value;
+        let dueBy = taskDialog.querySelector("#task-due").value;
+        let priority = taskDialog.querySelector("#task-priority").value;
+        let project = taskDialog.querySelector("#task-project").value;
+
+        for(let i = 0; i < projectList.length; i++){
+            if(projectList[i].projectTitle == project){
+                let task = projectList[i].addToDo(taskName, taskDescription, dueBy, priority);
+                console.log(task);
+                showList().showCard(showList().createCard(task))
+                break;
+            }
+        }
+
+        taskDialog.reset(); 
+    }
+    
+    return {processProject, processTask}
+}
+
+function linkDOM(){
+    function linkDialog(){
+        const addTask = document.querySelector("#add-task");
+        const taskDialog = document.querySelector("#task");
+        const closeTask = taskDialog.querySelector(".close-dialog")
+        const submitTask = taskDialog.querySelector(".submit-form")
+        addTask.addEventListener("click", () => taskDialog.showModal());
+        closeTask.addEventListener("click", () => taskDialog.close());
+        submitTask.addEventListener("click", () => processForm().processTask());
+    
+        const addProject = document.querySelector("#add-project");
+        const projDialog = document.querySelector("#project");
+        const closeProj = projDialog.querySelector(".close-dialog");
+        const submitProj = projDialog.querySelector(".submit-form")
+        addProject.addEventListener("click", () => projDialog.showModal());
+        closeProj.addEventListener("click", () => projDialog.close());
+        submitProj.addEventListener("click", () => processForm().processProject());
+    }
+
+    linkDialog();
+}
+
+function dummyData(){
+    let test = new Project("Testing")
+    addToList(test);
+
+    test.addToDo("test", "testing", "Wednesday, 17-12 03:24", "1")
+    test.addToDo("test2", "testing2", "date2", "2")
+    test.addToDo("test2", "testing2", "date2", "2")
+    test.addToDo("test2", "testing2", "date2", "2")
+
+    let todo = new visualList(projectList);
+    todo.resetList();
+    for(let i = 0; i < todo.list.length; i++){
+        showList().showCard(showList().createCard(todo.list[i]))
     }
 }
 
-let test = new Project("Testing")
-test.addToDo("test", "testing", "Wednesday, 17-12 03:24", "1")
-test.addToDo("test2", "testing2", "date2", "2")
-test.addToDo("test2", "testing2", "date2", "2")
-test.addToDo("test2", "testing2", "date2", "2")
-addToList(test);
+//dummyData();
 
-let todo = new createList(projectList);
-todo.resetList();
-console.log(todo.list);
-
-showList(todo.list);
+let unassigned = new Project("Unassigned");
+addToList(unassigned);
+linkDOM();
