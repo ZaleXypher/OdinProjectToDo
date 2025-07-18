@@ -1,11 +1,12 @@
 import "./style.css";
-import {Project, visualList} from "./todo.js";
+import {Project, visualSort} from "./todo.js";
 import projectSymbol from "./images/book-variant.svg";
 import completed from "./images/book-plus.svg";
 import incomplete from "./images/book-minus.svg";
 
 /*TODO: replace with localStorage */
 let projectList = []
+let cardList = new visualSort(projectList);
 function addToList(project){
     projectList.push(project);
     showProjects();
@@ -23,6 +24,7 @@ function addToList(project){
             project.appendChild(image);
 
             let text = document.createElement("button");
+            text.value = projectList[i].projectTitle;
             text.textContent = projectList[i].projectTitle;
             project.appendChild(text);
             
@@ -42,7 +44,7 @@ function addToList(project){
     }
 }
 
-function showList(){
+function listDisplay(){
     function createCard(listItem){
         let card = document.createElement("div");
         card.classList.add("card");
@@ -103,11 +105,18 @@ function showList(){
         };
         return card
     }
+
     function showCard(card){
         const cardsShown = document.querySelector("#todo-list")
         cardsShown.appendChild(card)
     }
-    return {createCard, showCard}
+    
+    function updateList(){
+        for(let i = 0 ; i < cardList.list.length; i++){
+            listDisplay().showCard(listDisplay().createCard(cardList.list[i]));
+        }
+    }
+    return {createCard, showCard, updateList}
 }
 
 function processForm(){
@@ -130,8 +139,8 @@ function processForm(){
         for(let i = 0; i < projectList.length; i++){
             if(projectList[i].projectTitle == project){
                 let task = projectList[i].addToDo(taskName, taskDescription, dueBy, priority);
-                console.log(task);
-                showList().showCard(showList().createCard(task))
+                listDisplay().showCard(listDisplay().createCard(task))
+                cardList.resetSorting();
                 break;
             }
         }
@@ -161,6 +170,7 @@ function linkDOM(){
         submitProj.addEventListener("click", () => processForm().processProject());
     }
 
+
     linkDialog();
 }
 
@@ -168,20 +178,29 @@ function dummyData(){
     let test = new Project("Testing")
     addToList(test);
 
-    test.addToDo("test", "testing", "Wednesday, 17-12 03:24", "1")
-    test.addToDo("test2", "testing2", "date2", "2")
-    test.addToDo("test2", "testing2", "date2", "2")
-    test.addToDo("test2", "testing2", "date2", "2")
+    let unassigned = new Project("Unassigned");
+    addToList(unassigned);
 
-    let todo = new visualList(projectList);
-    todo.resetList();
-    for(let i = 0; i < todo.list.length; i++){
-        showList().showCard(showList().createCard(todo.list[i]))
-    }
+    test.addToDo("test", "testing", "2025-07-22", "1")
+    test.addToDo("test2", "testing2", "2025-07-23", "2")
+    test.addToDo("test3", "testing3", "2025-07-24", "1")
+    test.addToDo("test4", "testing4", "2025-07-25", "2")
+    test.addToDo("test5", "testing5", "2026-07-26", "0")
+    test.addToDo("test6", "testing6", "2025-09-23", "1")
+    
+    unassigned.addToDo("test", "testing", "2025-07-22", "1")
+    unassigned.addToDo("test2", "testing2", "2025-07-23", "2")
+    unassigned.addToDo("test3", "testing3", "2025-07-24", "1")
+    unassigned.addToDo("test4", "testing4", "2025-07-25", "2")
+    unassigned.addToDo("test5", "testing5", "2026-07-26", "0")
+    unassigned.addToDo("test6", "testing6", "2025-09-23", "1")
+
+    cardList.resetSorting();
+    cardList.sortCompletion("both");
+    listDisplay().updateList();
 }
 
-//dummyData();
+dummyData();
 
-let unassigned = new Project("Unassigned");
-addToList(unassigned);
+
 linkDOM();

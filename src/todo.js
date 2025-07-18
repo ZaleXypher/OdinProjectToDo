@@ -1,3 +1,5 @@
+import { compareAsc, compareDesc} from "date-fns";
+
 export class Project{
     constructor (title){
         this.projectTitle = title;
@@ -21,7 +23,7 @@ export class Project{
     }
 }
 
-export class visualList {
+export class visualSort {
     constructor (list){
         this.logicTodo = list;
         this.visualList = [];
@@ -31,7 +33,7 @@ export class visualList {
         return this.visualList;
     }
     
-    resetList(){
+    resetSorting(){
         this.visualList = [];
         for(let i = 0; i < this.logicTodo.length; i++){
             for(let o = 0; o < this.logicTodo[i].todo.length; o++){
@@ -41,29 +43,49 @@ export class visualList {
     }
 
     sortPriority(){
-        function high(){
-            this.visualList.sort((a, b) => b.priority - a.priority)
-        }
-        function low(){
-            this.visualList.sort((a, b) => a.priority - b.priority)
-        }
+        const high = () => this.visualList.sort((a, b) => b.priority - a.priority)
+        const low = () => this.visualList.sort((a, b) => a.priority - b.priority)
         return {high, low}
     }
     
     sortDue(){
-        function closest(){
-
-        }
-        function furthest(){
-
-        }
+        const closest = () => this.visualList.sort((a, b) => compareAsc(a.due, b.due));
+        const furthest = () => this.visualList.sort((a, b) => compareDesc(a.due, b.due));
+        return {closest, furthest}
     }
 
     sortProject(project){
         this.visualList = [];
-        for(let i = 0; i < this.logicTodo; i++){
-            if(project == this.logicTodo[i]){
-                this.visualList.push(this.logicTodo[i]);
+        console.log(this.logicTodo);
+        for(let i = 0; i < this.logicTodo.length; i++){
+            if(project == this.logicTodo[i].projectTitle){
+                for(let o = 0; o < this.logicTodo[i].todo.length; o++){
+                    this.visualList.push(this.logicTodo[i].todo[o]);
+                }
+                break;
+            }
+        }
+    }
+
+    sortCompletion(status){
+        this.visualList = [];
+        let compStat = 0
+        switch(status){
+            case "incomplete":
+                compStat = 0;
+                break;
+            case "completed":
+                compStat = 1;
+                break;
+            case "both":
+                compStat = 2;
+                break;
+        }
+        for(let i = 0; i < this.logicTodo.length; i++){
+            for(let o = 0; o < this.logicTodo[i].todo.length; o++){
+                if(this.logicTodo[i].todo[o].completion == compStat || compStat == 2){
+                    this.visualList.push(this.logicTodo[i].todo[o]);
+                }   
             }
         }
     }

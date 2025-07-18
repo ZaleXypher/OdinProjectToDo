@@ -186,7 +186,7 @@ nav>button:active, .completion>button:active{
     grid-column: 2 /3;
     overflow: hidden;
     font-weight: 500;
-    font-size: .8em;
+    font-size: .9em;
     display: flex;
     align-items: center;
     justify-content: center;
