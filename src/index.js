@@ -4,7 +4,9 @@ import projectSymbol from "./images/book-variant.svg";
 import completed from "./images/book-plus.svg";
 import incomplete from "./images/book-minus.svg";
 
-/*TODO: replace with localStorage */
+//TODO: replace with localStorage
+//TODO: work on date sort
+//TODO: delete enetry button
 let projectList = []
 let cardList = new visualSort(projectList);
 function addToList(project){
@@ -48,6 +50,7 @@ function listDisplay(){
     function createCard(listItem){
         let card = document.createElement("div");
         card.classList.add("card");
+        card.dataset.id = listItem.id;
 
         let title = document.createElement("div");
         title.classList.add("title");
@@ -74,6 +77,7 @@ function listDisplay(){
         let projectName = document.createElement("div");
         projectName.classList.add("project-name");
         projectName.textContent = listItem.project;
+        let project = projectName.textContent;
         card.appendChild(projectName);
 
         let date = document.createElement("div");
@@ -103,12 +107,30 @@ function listDisplay(){
                 complete.textContent = "Incomplete";
             }
         };
-        return card
+        return {card, project}
     }
 
-    function showCard(card){
-        const cardsShown = document.querySelector("#todo-list")
-        cardsShown.appendChild(card)
+    function showCard(createdCard){
+        const cardsShown = document.querySelector("#todo-list");
+        cardsShown.appendChild(createdCard.card);
+        const delButton = document.createElement("button");
+        delButton.classList.add("del");
+        delButton.addEventListener("click", deleteCard);
+        createdCard.card.appendChild(delButton)
+
+        function deleteCard(){
+            cardsShown.removeChild(createdCard.card);
+            let projectLocation = projectList.findIndex((item) => item.projectTitle == createdCard.project);
+            if(projectLocation != -1){
+                let todoLocation = projectList[projectLocation].todo.findIndex((item) => item.id == createdCard.card.dataset.id);
+                if(todoLocation != -1){
+                    projectList[projectLocation].todo.splice(todoLocation, 1);
+                }
+                else console.log("id was not found in array")
+            }
+            else console.log("project was not found in array")
+            console.log(projectList);
+        }
     }
     
     function updateList(){

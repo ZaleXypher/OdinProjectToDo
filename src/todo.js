@@ -14,6 +14,7 @@ export class Project{
         temp.due = due;
         temp.priority = priority;
         temp.completion = 0;
+        temp.id = crypto.randomUUID();
         this.todo.push(temp);
         return temp;
     }
