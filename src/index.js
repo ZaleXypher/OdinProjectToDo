@@ -3,31 +3,12 @@ import {Project, visualSort} from "./todo.js";
 import projectSymbol from "./images/book-variant.svg";
 import completed from "./images/book-plus.svg";
 import incomplete from "./images/book-minus.svg";
+import trash from "./images/trash-can.svg";
 
 function addToList(project){
     projectList.push(project);
-    showProjects();
+    listDisplay().showProjects();
     updateFormList();
-
-    function showProjects(){
-        const list = document.querySelector(".project-list");
-        list.replaceChildren();
-        for(let i = 0; i < projectList.length; i++){
-            let project = document.createElement("div");
-            project.classList.add("project");
-
-            let image = document.createElement("img");
-            image.src = projectSymbol;
-            project.appendChild(image);
-
-            let text = document.createElement("button");
-            text.value = projectList[i].projectTitle;
-            text.textContent = projectList[i].projectTitle;
-            project.appendChild(text);
-            
-            list.appendChild(project);
-        }
-    }
 
     function updateFormList(){
         const list = document.querySelector("#task-project");
@@ -136,7 +117,38 @@ function listDisplay(){
         }
     }
 
- return {createCard, showCard, updateList}
+    function showProjects(){
+        const list = document.querySelector(".project-list");
+        list.replaceChildren();
+        console.log(projectList.length);
+        for(let i = 0; i < projectList.length; i++){
+            let project = document.createElement("div");
+            project.classList.add("project");
+
+            let image = document.createElement("img");
+            image.src = projectSymbol;
+
+            let text = document.createElement("button");
+            text.value = projectList[i].projectTitle;
+            text.textContent = projectList[i].projectTitle;
+
+            let delImg = document.createElement("img");
+            delImg.src = trash;
+            delImg.classList.add("del-img");
+            delImg.addEventListener("click", () => {
+                list.removeChild(project);
+                projectList.splice(projectList.findIndex(() => projectList.projectTitle == text.value), 1);
+                localStor().saveList();
+            })
+            
+            project.appendChild(delImg);
+            project.appendChild(image);
+            project.appendChild(text);
+            list.appendChild(project);
+        }
+    }
+
+ return {createCard, showCard, updateList, showProjects}
 }
 
 function processForm(){
@@ -302,13 +314,18 @@ function dummyData(){
 function localStor(){
     function saveList(list){
         let data = JSON.stringify(list);
-        console.log(data);
         localStorage.setItem("data", data);
     }
 
     function retrieveList(){
         let data = localStorage.getItem("data");
-        return JSON.parse(data);
+        let result = [];
+        if(data == "undefined"){
+            result = [];
+            saveList();
+        }
+        else result = JSON.parse(data);
+        return result;
     }
 
     return {saveList, retrieveList}
@@ -324,8 +341,8 @@ function init(){
         addToList(unassigned);
     }
     window.cardList = new visualSort(projectList);
+    listDisplay().showProjects();
     cardList.resetSorting();
-
     listDisplay().updateList();
     linkDOM();
 }

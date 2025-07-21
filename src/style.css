@@ -28,6 +28,11 @@ nav{
     padding: 1.5em;
 }
 
+.project .del-img{
+    color: red;
+    cursor: pointer;
+}
+
 nav>button, .project>button{
     font-size: 1em;
     color: var(--color-sidebar-darktext);
