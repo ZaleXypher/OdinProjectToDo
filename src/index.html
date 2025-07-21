@@ -54,11 +54,9 @@
         <img src="./images/logo.svg" alt="Logo">
         <button type="button" id="add-task"><img src="./images/book-plus.svg">Add Task</button>
         <button type="button" id="show-all"><img src="./images/list-box-outline.svg">View All</button>
-        <button type="button" class="today"><img src="./images/clipboard-alert-outline.svg">Due Today</button>
-        <button type="button" class="upcoming"><img src="./images/clipboard-text-clock-outline.svg">Upcoming</button>
-        <button type="button" class="past"><img src="./images/clipboard-remove-outline.svg">Past Due</button>
-        <button type="button" class="uncomplete"><img src="./images/clipboard-text-off.svg">To Do</button>
-        <button type="button" class="complete"><img src="./images/clipboard-check-outline.svg">Complete</button>
+        <button type="button" id="today"><img src="./images/clipboard-alert-outline.svg">Due Today</button>
+        <button type="button" id="upcoming"><img src="./images/clipboard-text-clock-outline.svg">Upcoming</button>
+        <button type="button" id="past"><img src="./images/clipboard-remove-outline.svg">Past Due</button>
         <span class="divider">Projects</span>
         <button type="button" id="add-project"><img src="./images/book-plus.svg">Add Project</button>
         <div class="project-list"></div>
@@ -75,9 +73,8 @@
             </div>
             <div class="sort">
                 <select name="sortby" id="sort">
-                    <option value="default">Date Added</option>
-                    <option value="high-priority">High-to-Low Priority</option>
                     <option value="low-priority">Low-to-High Priority</option>
+                    <option value="high-priority">High-to-Low Priority</option>
                     <option value="closest-due">Closest Due</option>
                     <option value="furthest-due">Furthest Due</option>
                 </select>

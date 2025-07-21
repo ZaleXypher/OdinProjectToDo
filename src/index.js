@@ -5,8 +5,6 @@ import completed from "./images/book-plus.svg";
 import incomplete from "./images/book-minus.svg";
 
 //TODO: replace with localStorage
-//TODO: work on date sort
-//TODO: delete enetry button
 let projectList = []
 let cardList = new visualSort(projectList);
 function addToList(project){
@@ -115,8 +113,9 @@ function listDisplay(){
         cardsShown.appendChild(createdCard.card);
         const delButton = document.createElement("button");
         delButton.classList.add("del");
+        delButton.textContent = "Delete";
         delButton.addEventListener("click", deleteCard);
-        createdCard.card.appendChild(delButton)
+        createdCard.card.appendChild(delButton);
 
         function deleteCard(){
             cardsShown.removeChild(createdCard.card);
@@ -129,16 +128,18 @@ function listDisplay(){
                 else console.log("id was not found in array")
             }
             else console.log("project was not found in array")
-            console.log(projectList);
         }
     }
     
     function updateList(){
+        const todoList = document.querySelector("#todo-list");
+        todoList.innerHTML = '';
         for(let i = 0 ; i < cardList.list.length; i++){
             listDisplay().showCard(listDisplay().createCard(cardList.list[i]));
         }
     }
-    return {createCard, showCard, updateList}
+
+ return {createCard, showCard, updateList}
 }
 
 function processForm(){
@@ -192,7 +193,97 @@ function linkDOM(){
         submitProj.addEventListener("click", () => processForm().processProject());
     }
 
+    function linkSort(){
+        let currView = "show-all"
+        let currProj = "show-all";
+        let currCompletion = "both";
+        let completion = document.querySelector("#show-complete");
+        completion.addEventListener("change", () => currCompletion = completion.value);
+        let currSort = "low-priority";
+        let sort = document.querySelector("#sort");
+        sort.addEventListener("change", () => currSort = sort.value);
+        const showAll = document.querySelector("#show-all");
+        showAll.addEventListener("click", () => {cardList.resetSorting(); listDisplay().updateList(); currProj = "show-all"; currView = "show-all"});
 
+        const today = document.querySelector("#today");
+        today.addEventListener("click", () => {cardList.sortDue().today(); listDisplay().updateList(); currView = "today";});
+
+        const upcoming = document.querySelector("#upcoming");
+        upcoming.addEventListener("click", () => {cardList.sortDue().future(); listDisplay().updateList(); currView = "upcoming";});
+
+        const past = document.querySelector("#past");
+        past.addEventListener("click", () => {cardList.sortDue().past(); listDisplay().updateList(); currView = "past";});
+
+        const projects = document.querySelectorAll(".project>button");
+        for(let i = 0; i < projects.length; i++){
+            projects[i].addEventListener("click", () => {cardList.resetSorting(); cardList.sortProject(projects[i].value); listDisplay().updateList(); currProj = projects[i].value; currView = "project";})
+        }
+
+        const sorter = document.querySelectorAll("#top-bar select");
+        for(let i = 0; i < sorter.length; i++){
+            sorter[i].addEventListener("change", () => reSort(currView, currProj, currCompletion, currSort))
+        }
+    }
+
+    function reSort(view, proj, completion, sort){
+        switch(view){
+            case "show-all":
+                cardList.resetSorting(); 
+                listDisplay().updateList();
+                break;
+            case "project":
+                switch(proj){
+                    case "show-all":
+                        break;
+                    default:
+                        cardList.resetSorting(); 
+                        cardList.sortProject(proj);
+                        listDisplay().updateList();
+                        break;
+                }
+            case "today":
+                cardList.sortDue().today(); 
+                listDisplay().updateList();
+                break;
+            case "upcoming":
+                cardList.sortDue().future(); 
+                listDisplay().updateList();
+                break;
+            case "past":
+                cardList.sortDue().past(); 
+                listDisplay().updateList();
+                break;
+
+        }
+
+        switch(completion){
+            default:
+                cardList.sortCompletion(completion);
+                listDisplay().updateList();
+                break;
+        }
+
+        switch(sort){
+            case "low-priority":
+                cardList.sortPriority().low();
+                listDisplay().updateList();
+                break;
+            case "high-priority":
+                cardList.sortPriority().high();
+                listDisplay().updateList();
+                break;
+            case "closest-due":
+                cardList.sortDue().closest();
+                listDisplay().updateList();
+                break;
+            case "furthest-due":
+                cardList.sortDue().furthest();
+                listDisplay().updateList();
+                break;
+        }
+    }
+
+    linkSort();
     linkDialog();
 }
 
@@ -203,10 +294,10 @@ function dummyData(){
     let unassigned = new Project("Unassigned");
     addToList(unassigned);
 
-    test.addToDo("test", "testing", "2025-07-22", "1")
-    test.addToDo("test2", "testing2", "2025-07-23", "2")
-    test.addToDo("test3", "testing3", "2025-07-24", "1")
-    test.addToDo("test4", "testing4", "2025-07-25", "2")
+    test.addToDo("test", "testing", "2025-07-21", "1")
+    test.addToDo("test2", "testing2", "2025-07-20", "2")
+    test.addToDo("test3", "testing3", "2025-07-22", "1")
+    test.addToDo("test4", "testing4", "2025-07-19", "2")
     test.addToDo("test5", "testing5", "2026-07-26", "0")
     test.addToDo("test6", "testing6", "2025-09-23", "1")
     
@@ -216,13 +307,11 @@ function dummyData(){
     unassigned.addToDo("test4", "testing4", "2025-07-25", "2")
     unassigned.addToDo("test5", "testing5", "2026-07-26", "0")
     unassigned.addToDo("test6", "testing6", "2025-09-23", "1")
-
     cardList.resetSorting();
     cardList.sortCompletion("both");
     listDisplay().updateList();
 }
 
 dummyData();
-
 
 linkDOM();
