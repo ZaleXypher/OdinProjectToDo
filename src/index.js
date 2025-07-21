@@ -5,24 +5,24 @@ import completed from "./images/book-plus.svg";
 import incomplete from "./images/book-minus.svg";
 import trash from "./images/trash-can.svg";
 
-function addToList(project){
-    projectList.push(project);
-    listDisplay().showProjects();
+function addToList(project, listProject){
+    listProject.push(project);
+    listDisplay(project, listProject).showProjects();
     updateFormList();
 
     function updateFormList(){
         const list = document.querySelector("#task-project");
         list.replaceChildren();
-        for(let i = 0; i < projectList.length; i++){
+        for(let i = 0; i < listProject.length; i++){
             let project = document.createElement("option");
-            project.value = projectList[i].projectTitle;
-            project.textContent = projectList[i].projectTitle;
+            project.value = listProject[i].projectTitle;
+            project.textContent = listProject[i].projectTitle;
             list.appendChild(project);
         }
     }
 }
 
-function listDisplay(){
+function listDisplay(listOfCards, listProject){
     function createCard(listItem){
         let card = document.createElement("div");
         card.classList.add("card");
@@ -97,11 +97,11 @@ function listDisplay(){
 
         function deleteCard(){
             cardsShown.removeChild(createdCard.card);
-            let projectLocation = projectList.findIndex((item) => item.projectTitle == createdCard.project);
+            let projectLocation = listProject.findIndex((item) => item.projectTitle == createdCard.project);
             if(projectLocation != -1){
-                let todoLocation = projectList[projectLocation].todo.findIndex((item) => item.id == createdCard.card.dataset.id);
+                let todoLocation = listProject[projectLocation].todo.findIndex((item) => item.id == createdCard.card.dataset.id);
                 if(todoLocation != -1){
-                    projectList[projectLocation].todo.splice(todoLocation, 1);
+                    listProject[projectLocation].todo.splice(todoLocation, 1);
                 }
                 else console.log("id was not found in array")
             }
@@ -112,16 +112,16 @@ function listDisplay(){
     function updateList(){
         const todoList = document.querySelector("#todo-list");
         todoList.innerHTML = '';
-        for(let i = 0 ; i < cardList.list.length; i++){
-            listDisplay().showCard(listDisplay().createCard(cardList.list[i]));
+        for(let i = 0 ; i < listOfCards.list.length; i++){
+            listDisplay(listOfCards, listProject).showCard(listDisplay(listOfCards, listProject).createCard(listOfCards.list[i]));
         }
     }
 
     function showProjects(){
         const list = document.querySelector(".project-list");
         list.replaceChildren();
-        console.log(projectList.length);
-        for(let i = 0; i < projectList.length; i++){
+        console.log(listProject.length);
+        for(let i = 0; i < listProject.length; i++){
             let project = document.createElement("div");
             project.classList.add("project");
 
@@ -129,15 +129,15 @@ function listDisplay(){
             image.src = projectSymbol;
 
             let text = document.createElement("button");
-            text.value = projectList[i].projectTitle;
-            text.textContent = projectList[i].projectTitle;
+            text.value = listProject[i].projectTitle;
+            text.textContent = listProject[i].projectTitle;
 
             let delImg = document.createElement("img");
             delImg.src = trash;
             delImg.classList.add("del-img");
             delImg.addEventListener("click", () => {
                 list.removeChild(project);
-                projectList.splice(projectList.findIndex(() => projectList.projectTitle == text.value), 1);
+                listProject.splice(listProject.findIndex(() => listProject.projectTitle == text.value), 1);
                 localStor().saveList();
             })
             
@@ -151,14 +151,16 @@ function listDisplay(){
  return {createCard, showCard, updateList, showProjects}
 }
 
-function processForm(){
+function processForm(list, listProject){
+    const linkedDisplay = listDisplay(list, listProject);
+
     function processProject(){
         const projDialog = document.querySelector("#project-form");
         let projTitle = projDialog.querySelector("#project-title").value;
         let projCreate = new Project(projTitle);
-        addToList(projCreate);
+        addToList(projCreate, listProject);
         projDialog.reset();
-        localStor().saveList(projectList);
+        localStor().saveList(listProject);
     }
 
     function processTask(){
@@ -169,23 +171,25 @@ function processForm(){
         let priority = taskDialog.querySelector("#task-priority").value;
         let project = taskDialog.querySelector("#task-project").value;
 
-        for(let i = 0; i < projectList.length; i++){
-            if(projectList[i].projectTitle == project){
-                let task = projectList[i].addToDo(taskName, taskDescription, dueBy, priority);
-                listDisplay().showCard(listDisplay().createCard(task))
-                cardList.resetSorting();
+        for(let i = 0; i < listProject.length; i++){
+            if(listProject[i].projectTitle == project){
+                let task = listProject[i].addToDo(taskName, taskDescription, dueBy, priority);
+                linkedDisplay.showCard(linkedDisplay.createCard(task))
+                list.resetSorting();
                 break;
             }
         }
 
         taskDialog.reset();
-        localStor().saveList(projectList);
+        localStor().saveList(listProject);
     }
     
     return {processProject, processTask}
 }
 
-function linkDOM(){
+function linkDOM(list, listProject){
+    const linkedDisplay = listDisplay(list, listProject);
+
     function linkDialog(){
         const addTask = document.querySelector("#add-task");
         const taskDialog = document.querySelector("#task");
@@ -193,7 +197,7 @@ function linkDOM(){
         const submitTask = taskDialog.querySelector(".submit-form")
         addTask.addEventListener("click", () => taskDialog.showModal());
         closeTask.addEventListener("click", () => taskDialog.close());
-        submitTask.addEventListener("click", () => processForm().processTask());
+        submitTask.addEventListener("click", () => processForm(list, listProject).processTask());
     
         const addProject = document.querySelector("#add-project");
         const projDialog = document.querySelector("#project");
@@ -201,7 +205,7 @@ function linkDOM(){
         const submitProj = projDialog.querySelector(".submit-form")
         addProject.addEventListener("click", () => projDialog.showModal());
         closeProj.addEventListener("click", () => projDialog.close());
-        submitProj.addEventListener("click", () => processForm().processProject());
+        submitProj.addEventListener("click", () => processForm(list, listProject).processProject());
     }
 
     function linkSort(){
@@ -214,20 +218,20 @@ function linkDOM(){
         let sort = document.querySelector("#sort");
         sort.addEventListener("change", () => currSort = sort.value);
         const showAll = document.querySelector("#show-all");
-        showAll.addEventListener("click", () => {cardList.resetSorting(); listDisplay().updateList(); currProj = "show-all"; currView = "show-all"});
+        showAll.addEventListener("click", () => {list.resetSorting(); linkedDisplay.updateList(); currProj = "show-all"; currView = "show-all"});
 
         const today = document.querySelector("#today");
-        today.addEventListener("click", () => {cardList.sortDue().today(); listDisplay().updateList(); currView = "today";});
+        today.addEventListener("click", () => {list.sortDue().today(); linkedDisplay.updateList(); currView = "today";});
 
         const upcoming = document.querySelector("#upcoming");
-        upcoming.addEventListener("click", () => {cardList.sortDue().future(); listDisplay().updateList(); currView = "upcoming";});
+        upcoming.addEventListener("click", () => {list.sortDue().future(); linkedDisplay.updateList(); currView = "upcoming";});
 
         const past = document.querySelector("#past");
-        past.addEventListener("click", () => {cardList.sortDue().past(); listDisplay().updateList(); currView = "past";});
+        past.addEventListener("click", () => {list.sortDue().past(); linkedDisplay.updateList(); currView = "past";});
 
         const projects = document.querySelectorAll(".project>button");
         for(let i = 0; i < projects.length; i++){
-            projects[i].addEventListener("click", () => {cardList.resetSorting(); cardList.sortProject(projects[i].value); listDisplay().updateList(); currProj = projects[i].value; currView = "project";})
+            projects[i].addEventListener("click", () => {list.resetSorting(); list.sortProject(projects[i].value); listDisplay(list, listProject).updateList(); currProj = projects[i].value; currView = "project";})
         }
 
         const sorter = document.querySelectorAll("#top-bar select");
@@ -239,57 +243,57 @@ function linkDOM(){
     function reSort(view, proj, completion, sort){
         switch(view){
             case "show-all":
-                cardList.resetSorting(); 
-                listDisplay().updateList();
+                list.resetSorting(); 
+                linkedDisplay.updateList();
                 break;
             case "project":
                 switch(proj){
                     case "show-all":
                         break;
                     default:
-                        cardList.resetSorting(); 
-                        cardList.sortProject(proj);
-                        listDisplay().updateList();
+                        list.resetSorting(); 
+                        list.sortProject(proj);
+                        linkedDisplay.updateList();
                         break;
                 }
             case "today":
-                cardList.sortDue().today(); 
-                listDisplay().updateList();
+                list.sortDue().today(); 
+                linkedDisplay.updateList();
                 break;
             case "upcoming":
-                cardList.sortDue().future(); 
-                listDisplay().updateList();
+                list.sortDue().future(); 
+                linkedDisplay.updateList();
                 break;
             case "past":
-                cardList.sortDue().past(); 
-                listDisplay().updateList();
+                list.sortDue().past(); 
+                linkedDisplay.updateList();
                 break;
 
         }
 
         switch(completion){
             default:
-                cardList.sortCompletion(completion);
-                listDisplay().updateList();
+                list.sortCompletion(completion);
+                linkedDisplay.updateList();
                 break;
         }
 
         switch(sort){
             case "low-priority":
-                cardList.sortPriority().low();
-                listDisplay().updateList();
+                list.sortPriority().low();
+                linkedDisplay.updateList();
                 break;
             case "high-priority":
-                cardList.sortPriority().high();
-                listDisplay().updateList();
+                list.sortPriority().high();
+                linkedDisplay.updateList();
                 break;
             case "closest-due":
-                cardList.sortDue().closest();
-                listDisplay().updateList();
+                list.sortDue().closest();
+                linkedDisplay.updateList();
                 break;
             case "furthest-due":
-                cardList.sortDue().furthest();
-                listDisplay().updateList();
+                list.sortDue().furthest();
+                linkedDisplay.updateList();
                 break;
         }
     }
@@ -341,10 +345,11 @@ function init(){
         addToList(unassigned);
     }
     window.cardList = new visualSort(projectList);
-    listDisplay().showProjects();
+    const displayCards = listDisplay(cardList, projectList);
+    displayCards.showProjects();
     cardList.resetSorting();
-    listDisplay().updateList();
-    linkDOM();
+    displayCards.updateList();
+    linkDOM(cardList, projectList);
 }
 
 init();
