@@ -4,9 +4,6 @@ import projectSymbol from "./images/book-variant.svg";
 import completed from "./images/book-plus.svg";
 import incomplete from "./images/book-minus.svg";
 
-//TODO: replace with localStorage
-let projectList = []
-let cardList = new visualSort(projectList);
 function addToList(project){
     projectList.push(project);
     showProjects();
@@ -149,6 +146,7 @@ function processForm(){
         let projCreate = new Project(projTitle);
         addToList(projCreate);
         projDialog.reset();
+        localStor().saveList(projectList);
     }
 
     function processTask(){
@@ -168,7 +166,8 @@ function processForm(){
             }
         }
 
-        taskDialog.reset(); 
+        taskDialog.reset();
+        localStor().saveList(projectList);
     }
     
     return {processProject, processTask}
@@ -290,28 +289,45 @@ function linkDOM(){
 function dummyData(){
     let test = new Project("Testing")
     addToList(test);
-
-    let unassigned = new Project("Unassigned");
-    addToList(unassigned);
-
     test.addToDo("test", "testing", "2025-07-21", "1")
     test.addToDo("test2", "testing2", "2025-07-20", "2")
     test.addToDo("test3", "testing3", "2025-07-22", "1")
     test.addToDo("test4", "testing4", "2025-07-19", "2")
     test.addToDo("test5", "testing5", "2026-07-26", "0")
     test.addToDo("test6", "testing6", "2025-09-23", "1")
-    
-    unassigned.addToDo("test", "testing", "2025-07-22", "1")
-    unassigned.addToDo("test2", "testing2", "2025-07-23", "2")
-    unassigned.addToDo("test3", "testing3", "2025-07-24", "1")
-    unassigned.addToDo("test4", "testing4", "2025-07-25", "2")
-    unassigned.addToDo("test5", "testing5", "2026-07-26", "0")
-    unassigned.addToDo("test6", "testing6", "2025-09-23", "1")
     cardList.resetSorting();
     cardList.sortCompletion("both");
-    listDisplay().updateList();
 }
 
-dummyData();
+function localStor(){
+    function saveList(list){
+        let data = JSON.stringify(list);
+        console.log(data);
+        localStorage.setItem("data", data);
+    }
 
-linkDOM();
+    function retrieveList(){
+        let data = localStorage.getItem("data");
+        return JSON.parse(data);
+    }
+
+    return {saveList, retrieveList}
+}
+
+function init(){
+    window.projectList = localStor().retrieveList();
+    if(projectList == null || !projectList.find((item) => item.projectTitle == "Unassigned")){
+        if(projectList == null){
+            projectList = []
+        }
+        let unassigned = new Project("Unassigned");
+        addToList(unassigned);
+    }
+    window.cardList = new visualSort(projectList);
+    cardList.resetSorting();
+
+    listDisplay().updateList();
+    linkDOM();
+}
+
+init();
